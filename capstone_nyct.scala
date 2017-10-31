@@ -74,7 +74,10 @@ val feature_assembler = new VectorAssembler()
 
 val featurized = feature_assembler.transform(a)
 
-// Linear regression model
+/* 
+ * Linear regression model. Just for testing - will be replaced with the pipeline
+ * that is for now in a separate file
+ */
 val lr = new LinearRegression().setFeaturesCol("features").setLabelCol("trip_duration")
 var model = lr.fit(featurized)
 println(s"Coefficients: ${model.coefficients} Intercept: ${model.intercept}")
