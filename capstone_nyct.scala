@@ -1,7 +1,7 @@
 // spark-shell
 
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.ml.feature.RFormula
+import org.apache.spark.ml.feature._
 import org.apache.spark.ml.regression.LinearRegression
 import org.apache.spark.ml.{Pipeline, PipelineModel}
 import org.apache.spark.ml.evaluation.BinaryClassificationEvaluator
@@ -60,6 +60,20 @@ var a = spark.sql("""
     from trips
     where pickup_longitude!=0 and pickup_latitude!=0 and dropoff_longitude!=0 and dropoff_latitude!=0
 """)
+
+// Try to do the same as the custom func dayToInt with the StringIndexer:
+val indexer = new StringIndexer()
+  .setInputCol("pickup_dow")
+  .setOutputCol("pickup_dow_idx")
+  .fit(a)
+val indexed = indexer.transform(a)
+
+// now use OneHotEncoder to create dummy variables
+val encoder = new OneHotEncoder()
+  .setInputCol("pickup_dow_idx")
+  .setOutputCol("pickup_dow_vector")
+
+val encoded = encoder.transform(indexed)
 
 // some example funcions on data frame
 a.select("pickup_dow").distinct.collect
