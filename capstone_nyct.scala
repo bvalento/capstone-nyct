@@ -54,49 +54,33 @@ var a = spark.sql("""
        cast(from_unixtime(unix_timestamp(tpep_pickup_datetime,'MM/dd/yyyy'), 'HH') as Int) AS pickup_hour,
        cast(from_unixtime(unix_timestamp(tpep_pickup_datetime,'MM/dd/yyyy'), 'mm') as Int) AS pickup_minute,
        from_unixtime(unix_timestamp(tpep_pickup_datetime), 'EE') AS pickup_dow,
-       dayToInt(date_format(tpep_pickup_datetime, 'EEEE')) AS pickup_dow_int,
        /* trip duration in seconds */
        unix_timestamp(tpep_dropoff_datetime) - unix_timestamp(tpep_pickup_datetime) AS trip_duration
     from trips
     where pickup_longitude!=0 and pickup_latitude!=0 and dropoff_longitude!=0 and dropoff_latitude!=0
 """)
 
-// Try to do the same as the custom func dayToInt with the StringIndexer:
-val indexer = new StringIndexer()
-  .setInputCol("pickup_dow")
-  .setOutputCol("pickup_dow_idx")
-  .fit(a)
-val indexed = indexer.transform(a)
-
-// now use OneHotEncoder to create dummy variables
-val encoder = new OneHotEncoder()
-  .setInputCol("pickup_dow_idx")
-  .setOutputCol("pickup_dow_vector")
-
-val encoded = encoder.transform(indexed)
-
 // some example funcions on data frame
 a.select("pickup_dow").distinct.collect
 a.groupBy("pickup_dow").count.show
 
-// select features
-val feature_assembler = new VectorAssembler()
-  .setInputCols(Array(
-      "pickup_month", "pickup_day", "pickup_hour", "pickup_minute", "pickup_dow_int", 
-      "pickup_longitude", "pickup_latitude", "dropoff_longitude", "dropoff_latitude"))
-  .setOutputCol("features")
+// use pipe elements directly, bypassing the pipe (just to try things out). All elements are set up in "pipeline setup.scala", used here.
 
-val featurized = feature_assembler.transform(a)
+val indexed = dow_indexer.transform(a)
+
+// now use OneHotEncoder to create dummy variables
+val encoded = dow_encoder.transform(indexed)
+
+// select features
+val featurized = feature_assembler.transform(encoded)
 
 /* 
  * Linear regression model. Just for testing - will be replaced with the pipeline
  * that is for now in a separate file
  */
-val lr = new LinearRegression().setFeaturesCol("features").setLabelCol("trip_duration")
-var model = lr.fit(featurized)
+val lregression = new LinearRegression().setFeaturesCol("features").setLabelCol("trip_duration")
+var model = lregression.fit(featurized)
 println(s"Coefficients: ${model.coefficients} Intercept: ${model.intercept}")
-
-
 
 // RDD func, might not work with data frames
 trips.filter(!_startsWith("VendorID,tpep_pickup_datetime,")).count
