@@ -10,6 +10,18 @@
  *                 model - transformer
 **/
 
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.ml.feature._
+import org.apache.spark.ml.regression.LinearRegression
+import org.apache.spark.ml.{Pipeline, PipelineModel}
+import org.apache.spark.ml.evaluation.BinaryClassificationEvaluator
+import org.apache.spark.ml.tuning.{CrossValidator, ParamGridBuilder}
+import spark.implicits._
+
+import org.apache.spark.ml.feature.VectorAssembler
+import org.apache.spark.ml.linalg.Vectors
+
+
 // use OneHotEncoder to create dummy variables. OneHotEncoder can only encode numeric types - hence the indexer
 val dow_indexer = new StringIndexer().setInputCol("pickup_dow").setOutputCol("pickup_dow_idx")
 val dow_encoder = new OneHotEncoder().setInputCol("pickup_dow_idx").setOutputCol("pickup_dow_dummy")
@@ -26,12 +38,25 @@ val feature_assembler = new VectorAssembler()
       "pickup_longitude", "pickup_latitude", "dropoff_longitude", "dropoff_latitude"))
   .setOutputCol("features")
 
-val lregression = new LinearRegression().setFeaturesCol("features").setLabelCol("trip_duration")
+val scaler = new StandardScaler()
+  .setInputCol("features").setOutputCol("scaled_features")
+  .setWithStd(true).setWithMean(false)
+  
+val lregression = new LinearRegression().setFeaturesCol("scaled_features").setLabelCol("trip_duration")
 
-var pipeline = new Pipeline().setStages(Array(dow_indexer, dow_encoder, min_encoder, hour_encoder, feature_assembler, lregression))
+// training pipeline
+var trainPipe = new Pipeline().setStages(Array(dow_indexer, dow_encoder, min_encoder, hour_encoder, feature_assembler, scaler, lregression))
 
+// Training pipeline setup up to here - following lines are just for testing
 
-var model = pipeline.fit(a)
+// train, predict - using kaggleTrain and kaggleTest
+var model = trainPipe.fit(kaggleTrain)
+// Predict using model (PipeModel) - it contains the same transformations already as the pipeline that produced it
+var p = model.transform(kaggleTest)
+
+// train using the full dataset
+var full_model = trainPipe.fit(fullDataSet)
+var p_full = full_model.transform(kaggleTest)
 
 // Not sure what these parameters mean - investigate
 val paramGrid = new ParamGridBuilder()

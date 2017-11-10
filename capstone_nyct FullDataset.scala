@@ -32,5 +32,5 @@ var fullDataSet = spark.sql("""
        /* trip duration in seconds */
        unix_timestamp(tpep_dropoff_datetime) - unix_timestamp(tpep_pickup_datetime) AS trip_duration
     from trips
-    where pickup_longitude!=0 and pickup_latitude!=0 and dropoff_longitude!=0 and dropoff_latitude!=0
+    where pickup_longitude!=0 and pickup_latitude!=0 and dropoff_longitude!=0 and dropoff_latitude!=0 AND tpep_pickup_datetime != tpep_dropoff_datetime
 """)

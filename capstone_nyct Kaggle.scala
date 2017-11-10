@@ -1,16 +1,5 @@
 // spark-shell
 
-import org.apache.spark.sql.SparkSession
-import org.apache.spark.ml.feature._
-import org.apache.spark.ml.regression.LinearRegression
-import org.apache.spark.ml.{Pipeline, PipelineModel}
-import org.apache.spark.ml.evaluation.BinaryClassificationEvaluator
-import org.apache.spark.ml.tuning.{CrossValidator, ParamGridBuilder}
-import spark.implicits._
-
-import org.apache.spark.ml.feature.VectorAssembler
-import org.apache.spark.ml.linalg.Vectors
-
 /*
  * Kaggle train data set
  */
