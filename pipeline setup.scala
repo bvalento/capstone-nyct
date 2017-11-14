@@ -31,6 +31,10 @@ val dow_encoder = new OneHotEncoder().setInputCol("pickup_dow_idx").setOutputCol
 val min_encoder = new OneHotEncoder().setInputCol("pickup_minute").setOutputCol("pickup_minute_dummy")
 val hour_encoder = new OneHotEncoder().setInputCol("pickup_hour").setOutputCol("pickup_hour_dummy")
 
+// string indexer for label - needed by the random tree forest
+val labelIndexer = new StringIndexer().setInputCol("trip_duration_min").setOutputCol("trip_duration_min_idx")
+
+
 // Still need to investigate depedency of variables to select features properly - esp. the month and day of month, and number of passengers.
 
 val featureAssembler = new VectorAssembler()
@@ -45,10 +49,10 @@ val scaler = new StandardScaler()
   
 val lregression = new LinearRegression().setFeaturesCol("scaled_features").setLabelCol("trip_duration_min")
 
-val randomForest = new RandomForestClassifier().setFeaturesCol(/*"scaled_features"*/"features").setLabelCol("trip_duration_min").setNumTrees(500)
+val randomForest = new RandomForestClassifier().setFeaturesCol(/*"scaled_features"*/"features").setLabelCol("trip_duration_min_idx").setNumTrees(20)
 
 // training pipeline
-var trainPipe = new Pipeline().setStages(Array(dow_indexer, dow_encoder, min_encoder, hour_encoder, featureAssembler, /*scaler,*/ randomForest /*lregression*/))
+var trainPipe = new Pipeline().setStages(Array(dow_indexer, dow_encoder, min_encoder, hour_encoder, featureAssembler, /*scaler,*/ labelIndexer, randomForest /*lregression*/))
 
 // Training pipeline setup up to here - following lines are just for testing
 
@@ -58,7 +62,7 @@ var model = trainPipe.fit(kaggleTrain)
 var p = model.transform(kaggleTest)
 
 // train using the full dataset
-var full_model = trainPipe.fit(fullDataSet)
+var full_model = trainPipe.fit(fullTrain)
 var p_full = full_model.transform(kaggleTest)
 
 // Not sure what these parameters mean - investigate
