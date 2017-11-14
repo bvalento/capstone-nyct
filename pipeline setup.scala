@@ -12,6 +12,7 @@
 
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.ml.feature._
+import org.apache.spark.ml.classification.{RandomForestClassificationModel, RandomForestClassifier}
 import org.apache.spark.ml.regression.LinearRegression
 import org.apache.spark.ml.{Pipeline, PipelineModel}
 import org.apache.spark.ml.evaluation.BinaryClassificationEvaluator
@@ -32,7 +33,7 @@ val hour_encoder = new OneHotEncoder().setInputCol("pickup_hour").setOutputCol("
 
 // Still need to investigate depedency of variables to select features properly - esp. the month and day of month, and number of passengers.
 
-val feature_assembler = new VectorAssembler()
+val featureAssembler = new VectorAssembler()
   .setInputCols(Array(
       /*"pickup_month", "pickup_day",*/ "pickup_hour_dummy", "pickup_minute_dummy", "pickup_dow_dummy", 
       "pickup_longitude", "pickup_latitude", "dropoff_longitude", "dropoff_latitude"))
@@ -42,10 +43,12 @@ val scaler = new StandardScaler()
   .setInputCol("features").setOutputCol("scaled_features")
   .setWithStd(true).setWithMean(false)
   
-val lregression = new LinearRegression().setFeaturesCol("scaled_features").setLabelCol("trip_duration")
+val lregression = new LinearRegression().setFeaturesCol("scaled_features").setLabelCol("trip_duration_min")
+
+val randomForest = new RandomForestClassifier().setFeaturesCol(/*"scaled_features"*/"features").setLabelCol("trip_duration_min").setNumTrees(500)
 
 // training pipeline
-var trainPipe = new Pipeline().setStages(Array(dow_indexer, dow_encoder, min_encoder, hour_encoder, feature_assembler, scaler, lregression))
+var trainPipe = new Pipeline().setStages(Array(dow_indexer, dow_encoder, min_encoder, hour_encoder, featureAssembler, /*scaler,*/ randomForest /*lregression*/))
 
 // Training pipeline setup up to here - following lines are just for testing
 
