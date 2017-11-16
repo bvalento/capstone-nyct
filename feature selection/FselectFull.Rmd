@@ -17,17 +17,26 @@ ktrain  <- read.csv('C:\\Users\\Q06409\\Downloads\\Big Data\\CKME-136 Capstone p
 
 # Transform pickup day to day of week, day of month, month columns
 #ktrain$pickup_dow <- as.factor(wday(ktrain$pickup_datetime))
-ktrain$pickup_month <- as.factor(ktrain$pickup_month)
-ktrain$pickup_day <- as.factor(ktrain$pickup_day)
-ktrain$pickup_hour <- as.factor(ktrain$pickup_hour)
-ktrain$pickup_minute <- as.factor(ktrain$pickup_minute)
+#ktrain$pickup_month <- as.factor(ktrain$pickup_month)
+ktrain$pickup_day <- day(ktrain$tpep_pickup_datetime)
+#ktrain$pickup_hour <- as.factor(ktrain$pickup_hour)
+#ktrain$pickup_minute <- as.factor(ktrain$pickup_minute)
 
 summary(ktrain)
-hist(ktrain$trip_duration, breaks=100)
-hist(ktrain[ktrain$trip_duration < 7200, ]$trip_duration, breaks=100)
-hist(ktrain[ktrain$trip_duration > 7200, ]$trip_duration, breaks=100)
+hist(ktrain$trip_duration, breaks=100, main="All trips", xlab="Trip duration (seconds)")
+hist(ktrain[ktrain$trip_duration < 7200, ]$trip_duration, breaks=100, main="Trips shorter than 2 hours", xlab="Trip duration (seconds)")
+hist(ktrain[ktrain$trip_duration > 7200, ]$trip_duration, breaks=100, main="Trips longer than 2 hours", xlab="Trip duration (seconds)")
 
-hist(ktrain[ktrain$trip_duration < 3600, ]$trip_duration, breaks=100)
-hist(ktrain[ktrain$trip_duration > 3600, ]$trip_duration, breaks=100)
+hist(ktrain[ktrain$trip_duration < 3600, ]$trip_duration, breaks=100, main="Trips shorter than 1 hour", xlab="Trip duration (seconds)")
+hist(ktrain[ktrain$trip_duration > 3600, ]$trip_duration, breaks=100, main="Trips longer than 1 hour", xlab="Trip duration (seconds)")
+
+```
+
+Look at some dependencies:
+```{r}
+summary(lm(trip_duration ~ pickup_longitude + pickup_latitude + dropoff_longitude + dropoff_latitude + 
+             as.numeric(pickup_month) + pickup_day + pickup_hour + pickup_minute + as.numeric(pickup_dow), ktrain))
+
+summary(lm(trip_duration ~ pickup_longitude + pickup_latitude + dropoff_longitude +dropoff_latitude + pickup_month + pickup_day + pickup_hour, ktrain))
 
 ```

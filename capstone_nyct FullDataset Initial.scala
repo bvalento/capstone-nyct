@@ -1,7 +1,7 @@
 // spark-shell
 
 /*
- * Data frame with SQL - with a small subset test.csv
+ * Data frame with SQL - Initial obvious cleaning. This set will be sampled and used for analysis for further cleaning
  */
 val trips = spark.read
   .format("csv")
@@ -15,8 +15,7 @@ trips.createOrReplaceTempView("trips")
 
 // select columns, with new derived columns: month, day, dow, hour, minute for pickup, trip duration
 var fullDataSet = spark.sql("""
-    select 
-       tpep_pickup_datetime, tpep_dropoff_datetime, passenger_count,    
+    select tpep_pickup_datetime, tpep_dropoff_datetime, passenger_count,    
        pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude,
        /* derived columns */
        cast(from_unixtime(unix_timestamp(tpep_pickup_datetime,'MM/dd/yyyy'), 'MM') as Int) AS pickup_month,
@@ -26,11 +25,8 @@ var fullDataSet = spark.sql("""
        from_unixtime(unix_timestamp(tpep_pickup_datetime), 'EE') AS pickup_dow,
        /* trip duration in seconds */
        unix_timestamp(tpep_dropoff_datetime) - unix_timestamp(tpep_pickup_datetime) AS trip_duration
-       /*cast((unix_timestamp(tpep_dropoff_datetime) - unix_timestamp(tpep_pickup_datetime)) / 60 AS Int) AS trip_duration_min */
     from trips
-    where pickup_longitude!=0 and pickup_latitude!=0 and dropoff_longitude!=0 and dropoff_latitude!=0 
-          AND tpep_pickup_datetime != tpep_dropoff_datetime
-          AND unix_timestamp(tpep_dropoff_datetime) - unix_timestamp(tpep_pickup_datetime) < 3600
+    where pickup_longitude!=0 and pickup_latitude!=0 and dropoff_longitude!=0 and dropoff_latitude!=0 AND tpep_pickup_datetime != tpep_dropoff_datetime
 """)
 
 val splitSeed = 5043
@@ -39,6 +35,5 @@ val Array(fullTrain, fullTest) = fullDataSet.randomSplit(Array(0.9995, 0.0005), 
 fullTrain.cache
 fullTest.cache
 
-// now the data frame can be queried using sql:
-spark.sql("select * from trips")
-trips.select("VendorID").distinct.collect
+// Save for analysis, feature selection etc.
+fullTest.coalesce(1).write.format("csv").option("header", "true").save("/home/bohdan/fullTest.csv")

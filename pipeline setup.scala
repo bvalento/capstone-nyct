@@ -42,7 +42,7 @@ val labelIndexer = new StringIndexer().setInputCol("trip_duration").setOutputCol
 
 val featureAssembler = new VectorAssembler()
   .setInputCols(Array(
-      /*"pickup_month", "pickup_day",*/ "pickup_hour_dummy", "pickup_minute_dummy", "pickup_dow_dummy", 
+      "pickup_month", /*"pickup_day",*/ "pickup_hour_dummy", /*"pickup_minute_dummy", "pickup_dow_dummy",*/ 
       "pickup_longitude", "pickup_latitude", "dropoff_longitude", "dropoff_latitude"))
   .setOutputCol("features")
 
@@ -50,12 +50,12 @@ val scaler = new StandardScaler()
   .setInputCol("features").setOutputCol("scaled_features")
   .setWithStd(true).setWithMean(false)
   
-val lregression = new LinearRegression().setFeaturesCol(/*"scaled_features"*/ "features").setLabelCol("trip_duration")
+val lregression = new LinearRegression().setFeaturesCol("scaled_features" /*"features"*/).setLabelCol("trip_duration")
 
 //val randomForest = new RandomForestClassifier().setFeaturesCol(/*"scaled_features"*/"features").setLabelCol("trip_duration_idx").setNumTrees(10)
 
 // training pipeline
-var trainPipe = new Pipeline().setStages(Array(dow_indexer, dow_encoder, min_encoder, hour_encoder, featureAssembler, /*scaler,*/ labelIndexer, lregression))
+var trainPipe = new Pipeline().setStages(Array(dow_indexer, dow_encoder, min_encoder, hour_encoder, featureAssembler, scaler, labelIndexer, lregression))
 
 // Training pipeline setup up to here - following lines are just for testing
 
@@ -64,8 +64,8 @@ var kaggleModel = trainPipe.fit(kaggleTrain)
 var fullModel = trainPipe.fit(fullTrain)
 
 // save models (saves them to HDFS)
-kaggleModel.write.overwrite().save("/home/bohdan/kaggleModel")
-fullModel.write.overwrite().save("/home/bohdan/fullModel")
+kaggleModel.write.overwrite().save("/home/bohdan/kaggleModel_featSelected")
+fullModel.write.overwrite().save("/home/bohdan/fullModel_featSelected")
 
 /*
  * To load the models: 
