@@ -1,0 +1,33 @@
+---
+title: "Feature selection, sample of the full data set"
+author: "Bohdan Valentovic"
+date: "November 13, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(lubridate)
+```
+
+
+```{r}
+# read the sample file, use the provided header and use coma as the separating character
+ktrain  <- read.csv('C:\\Users\\Q06409\\Downloads\\Big Data\\CKME-136 Capstone project\\My project\\NYCT data\\fullTest.csv\\fullTest.csv', header = T, sep = ',')
+
+# Transform pickup day to day of week, day of month, month columns
+#ktrain$pickup_dow <- as.factor(wday(ktrain$pickup_datetime))
+ktrain$pickup_month <- as.factor(ktrain$pickup_month)
+ktrain$pickup_day <- as.factor(ktrain$pickup_day)
+ktrain$pickup_hour <- as.factor(ktrain$pickup_hour)
+ktrain$pickup_minute <- as.factor(ktrain$pickup_minute)
+
+summary(ktrain)
+hist(ktrain$trip_duration, breaks=100)
+hist(ktrain[ktrain$trip_duration < 7200, ]$trip_duration, breaks=100)
+hist(ktrain[ktrain$trip_duration > 7200, ]$trip_duration, breaks=100)
+
+hist(ktrain[ktrain$trip_duration < 3600, ]$trip_duration, breaks=100)
+hist(ktrain[ktrain$trip_duration > 3600, ]$trip_duration, breaks=100)
+
+```

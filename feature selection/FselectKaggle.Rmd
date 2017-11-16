@@ -14,6 +14,7 @@ library(lubridate)
 ```{r}
 # read the sample file, use the provided header and use coma as the separating character
 ktrain <- read.csv('C:\\Users\\Q06409\\Downloads\\Big Data\\CKME-136 Capstone project\\My project\\NYC Taxi Kaggle\\train.csv', header = T, sep = ',')
+ktrain  <- read.csv('C:\\Users\\Q06409\\Downloads\\Big Data\\CKME-136 Capstone project\\My project\\NYCT data\\fullTest.csv\\fullTest.csv', header = T, sep = ',')
 
 # Transform pickup day to day of week, day of month, month columns
 ktrain$pickup_dow <- as.factor(wday(ktrain$pickup_datetime))

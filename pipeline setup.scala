@@ -52,7 +52,7 @@ val scaler = new StandardScaler()
   
 val lregression = new LinearRegression().setFeaturesCol(/*"scaled_features"*/ "features").setLabelCol("trip_duration")
 
-val randomForest = new RandomForestClassifier().setFeaturesCol(/*"scaled_features"*/"features").setLabelCol("trip_duration_idx").setNumTrees(10)
+//val randomForest = new RandomForestClassifier().setFeaturesCol(/*"scaled_features"*/"features").setLabelCol("trip_duration_idx").setNumTrees(10)
 
 // training pipeline
 var trainPipe = new Pipeline().setStages(Array(dow_indexer, dow_encoder, min_encoder, hour_encoder, featureAssembler, /*scaler,*/ labelIndexer, lregression))

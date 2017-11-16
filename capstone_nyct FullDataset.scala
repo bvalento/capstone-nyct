@@ -37,7 +37,10 @@ var fullDataSet = spark.sql("""
 """)
 
 val splitSeed = 5043
-val Array(fullTrain, fullTest) = fullDataSet.randomSplit(Array(0.95, 0.05), splitSeed)
+val Array(fullTrain, fullTest) = fullDataSet.randomSplit(Array(0.9995, 0.0005), splitSeed)
 
 fullTrain.cache
 fullTest.cache
+
+// Save for analysis, feature selection etc.
+fullTest.coalesce(1).write.format("csv").option("header", "true").save("/home/bohdan/fullTest.csv")
