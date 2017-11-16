@@ -8,7 +8,7 @@ val k_train = spark.read
   .option("header", "true")
   .option("inferSchema", "true")
   .option("mode", "DROPMALFORMED")
-  .load("/user/bohdan/nyct/kaggle/train-kaggle.csv")
+  .load("/user/bohdan/nyct/kaggle/train.csv")
   
 /* register as table so you can use sql: */
 k_train.createOrReplaceTempView("k_train")
@@ -23,8 +23,8 @@ var kaggleTrain = spark.sql("""
        cast(from_unixtime(unix_timestamp(pickup_datetime,'MM/dd/yyyy'), 'HH') as Int) AS pickup_hour,
        cast(from_unixtime(unix_timestamp(pickup_datetime,'MM/dd/yyyy'), 'mm') as Int) AS pickup_minute,
        from_unixtime(unix_timestamp(pickup_datetime), 'EE') AS pickup_dow,
-       trip_duration,
-       cast(trip_duration / 60 as INT) AS trip_duration_min
+       trip_duration
+       /*cast(trip_duration / 60 as INT) AS trip_duration_min*/
     from k_train
 """)
 
