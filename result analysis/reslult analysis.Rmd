@@ -1,0 +1,22 @@
+---
+title: "Capstone Result analysis"
+author: "Bohdan Valentovic"
+date: "November 18, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+# load both datasets with predictions
+prdFull <- read.csv('W:\\Bohdan\\Big data\\Ryerson\\Capstone\\Predictions\\prdFull.csv', header = T, sep = ',')
+
+summary(prdFull)
+plot(prdFull)
+boxplot(prdFull)
+
+t.test(prdFull$trip_duration, prdFull$prediction)
+```
