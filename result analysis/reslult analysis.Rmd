@@ -12,11 +12,18 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 
 # load both datasets with predictions
-prdFull <- read.csv('W:\\Bohdan\\Big data\\Ryerson\\Capstone\\Predictions\\prdFull.csv', header = T, sep = ',')
+prdFull <- read.csv('C:\\Users\\Q06409\\Downloads\\Big Data\\CKME-136 Capstone project\\My project\\Predictions\\prdFull.csv', header = T, sep = ',')
+prdKaggle <- read.csv('C:\\Users\\Q06409\\Downloads\\Big Data\\CKME-136 Capstone project\\My project\\Predictions\\prdKaggle.csv', header = T, sep = ',')
+
 
 summary(prdFull)
-plot(prdFull)
-boxplot(prdFull)
+summary(prdKaggle)
 
-t.test(prdFull$trip_duration, prdFull$prediction)
+plot(prdFull$prediction, prdKaggle$prediction)
+boxplot(prdFull$prediction, prdKaggle$prediction)
+
+t.test(prdFull$prediction, prdKaggle$prediction)
+
+t.test(prdFull$trip_duration, prdKaggle$trip_duration)
+
 ```

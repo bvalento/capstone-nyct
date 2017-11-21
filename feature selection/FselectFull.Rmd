@@ -23,12 +23,22 @@ ktrain$pickup_day <- day(ktrain$tpep_pickup_datetime)
 #ktrain$pickup_minute <- as.factor(ktrain$pickup_minute)
 
 summary(ktrain)
-hist(ktrain$trip_duration, breaks=100, main="All trips", xlab="Trip duration (seconds)")
-hist(ktrain[ktrain$trip_duration < 7200, ]$trip_duration, breaks=100, main="Trips shorter than 2 hours", xlab="Trip duration (seconds)")
-hist(ktrain[ktrain$trip_duration > 7200, ]$trip_duration, breaks=100, main="Trips longer than 2 hours", xlab="Trip duration (seconds)")
+hist(ktrain$trip_duration, breaks=100, main="All trips, 0.05% sample", xlab="Trip duration (seconds)")
+#hist(ktrain[ktrain$trip_duration < 7200, ]$trip_duration, breaks=100, main="Trips shorter than 2 hours", xlab="Trip duration (seconds)")
+#hist(ktrain[ktrain$trip_duration > 7200, ]$trip_duration, breaks=100, main="Trips longer than 2 hours", xlab="Trip duration (seconds)")
 
-hist(ktrain[ktrain$trip_duration < 3600, ]$trip_duration, breaks=100, main="Trips shorter than 1 hour", xlab="Trip duration (seconds)")
-hist(ktrain[ktrain$trip_duration > 3600, ]$trip_duration, breaks=100, main="Trips longer than 1 hour", xlab="Trip duration (seconds)")
+hist(ktrain[ktrain$trip_duration < 3600, ]$trip_duration, breaks=100, main="Trips shorter than 1 hour (0.05% sample)", xlab="Trip duration (seconds)")
+hist(ktrain[ktrain$trip_duration > 3600, ]$trip_duration, breaks=100, main="Trips longer than 1 hour (0.05% sample)", xlab="Trip duration (seconds)")
+
+trainKaggle <- read.csv('C:\\Users\\Q06409\\Downloads\\Big Data\\CKME-136 Capstone project\\My project\\NYC Taxi Kaggle\\train.csv', header = T, sep = ',')
+
+summary(trainKaggle)
+hist(trainKaggle$trip_duration, breaks=100, main="All trips, Kaggle data set", xlab="Trip duration (seconds)")
+
+hist(trainKaggle[trainKaggle$trip_duration < 3600, ]$trip_duration, breaks=100, main="Trips shorter than 1 hour (Kaggle sample)", xlab="Trip duration (seconds)")
+hist(trainKaggle[trainKaggle$trip_duration > 3600, ]$trip_duration, breaks=100, main="Trips longer than 1 hour (Kaggle sample)", xlab="Trip duration (seconds)")
+
+
 
 ```
 
