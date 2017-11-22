@@ -16,7 +16,7 @@ trips.createOrReplaceTempView("trips")
 // select columns, with new derived columns: month, day, dow, hour, minute for pickup, trip duration
 var fullDataSet = spark.sql("""
     select 
-       tpep_pickup_datetime, tpep_dropoff_datetime, passenger_count,    
+       tpep_pickup_datetime, tpep_dropoff_datetime, passenger_count,
        pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude,
        /* derived columns */
        cast(from_unixtime(unix_timestamp(tpep_pickup_datetime,'MM/dd/yyyy'), 'MM') as Int) AS pickup_month,

@@ -2,9 +2,9 @@
  * Only pipeline setup. Other parts of the setup are done in initial investigation script.
  *
  * Elements:     
- *               trip, a - dataframes
+ *           
  *           dow_indexer - Day-of-week indexer (turns day of week name into factor) - see if dow_encoder can work directly with dow without this step
- *           dow_encoder - One-hot-encoder (dummy var) for day of week
+ *           *_encoder   - One-hot-encoders (dummy var) for day of week
  *     feature_assembler - transformer
  *           lregression - estimator
  *                 model - transformer
@@ -25,24 +25,14 @@ import spark.implicits._
 import org.apache.spark.ml.feature.VectorAssembler
 import org.apache.spark.ml.linalg.Vectors
 
-
-// use OneHotEncoder to create dummy variables. OneHotEncoder can only encode numeric types - hence the indexer
-val dow_indexer = new StringIndexer().setInputCol("pickup_dow").setOutputCol("pickup_dow_idx")
-val dow_encoder = new OneHotEncoder().setInputCol("pickup_dow_idx").setOutputCol("pickup_dow_dummy")
-
-// hour, minute
-val min_encoder = new OneHotEncoder().setInputCol("pickup_minute").setOutputCol("pickup_minute_dummy")
+// use OneHotEncoder to create dummy variables
 val hour_encoder = new OneHotEncoder().setInputCol("pickup_hour").setOutputCol("pickup_hour_dummy")
-
-// string indexer for label - needed by the random tree forest
-val labelIndexer = new StringIndexer().setInputCol("trip_duration").setOutputCol("trip_duration_idx")
-
-
-// Still need to investigate depedency of variables to select features properly - esp. the month and day of month, and number of passengers.
+val month_encoder = new OneHotEncoder().setInputCol("pickup_month").setOutputCol("pickup_month_dummy")
+val psgr_encoder = new OneHotEncoder().setInputCol("passenger_count").setOutputCol("passenger_count_dummy")
 
 val featureAssembler = new VectorAssembler()
   .setInputCols(Array(
-      "pickup_month", /*"pickup_day",*/ "pickup_hour_dummy", /*"pickup_minute_dummy", "pickup_dow_dummy",*/ 
+      "pickup_month_dummy", "pickup_hour_dummy", "passenger_count",
       "pickup_longitude", "pickup_latitude", "dropoff_longitude", "dropoff_latitude"))
   .setOutputCol("features")
 
@@ -50,14 +40,10 @@ val scaler = new StandardScaler()
   .setInputCol("features").setOutputCol("scaled_features")
   .setWithStd(true).setWithMean(false)
   
-val lregression = new LinearRegression().setFeaturesCol("scaled_features" /*"features"*/).setLabelCol("trip_duration")
-
-//val randomForest = new RandomForestClassifier().setFeaturesCol(/*"scaled_features"*/"features").setLabelCol("trip_duration_idx").setNumTrees(10)
+val lregression = new LinearRegression().setFeaturesCol("scaled_features").setLabelCol("trip_duration").setRegParam(0.3).setMaxIter(10)
 
 // training pipeline
-var trainPipe = new Pipeline().setStages(Array(dow_indexer, dow_encoder, min_encoder, hour_encoder, featureAssembler, scaler, labelIndexer, lregression))
-
-// Training pipeline setup up to here - following lines are just for testing
+var trainPipe = new Pipeline().setStages(Array(hour_encoder, month_encoder, featureAssembler, scaler, lregression))
 
 // Create two models, one for kaggle dataset, one for the 95% of full data set
 var kaggleModel = trainPipe.fit(kaggleTrain)
@@ -98,19 +84,3 @@ println(s"MAE: Kaggle: ${metricsKaggle.meanAbsoluteError}, Full data set: ${metr
 
 // Explained variance
 println(s"Explained variance: Kaggle: ${metricsKaggle.explainedVariance}, Full data set: ${metricsFull.explainedVariance}")
-
-
-// Not sure what these parameters mean - investigate
-val paramGrid = new ParamGridBuilder()
-//  .addGrid(hashingTF.numFeatures, Array(10, 100, 1000))
-  .addGrid(lregression.regParam, Array(0.1, 0.01))
-  .build()
-
-
-val cvalidator = new CrossValidator()
-  .setEstimator(pipeline)
-  .setEvaluator(new BinaryClassificationEvaluator)
-  .setEstimatorParamMaps(paramGrid)
-  .setNumFolds(10)
-
-var pipemodel = cvalidator.fit(a)
