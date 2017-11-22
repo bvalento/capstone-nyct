@@ -50,8 +50,8 @@ var kaggleModel = trainPipe.fit(kaggleTrain)
 var fullModel = trainPipe.fit(fullTrain)
 
 // save models (saves them to HDFS)
-kaggleModel.write.overwrite().save("/home/bohdan/kaggleModel_featSelected")
-fullModel.write.overwrite().save("/home/bohdan/fullModel_featSelected")
+kaggleModel.write.overwrite().save("/home/bohdan/kaggleModel")
+fullModel.write.overwrite().save("/home/bohdan/fullModel")
 
 /*
  * To load the models: 
