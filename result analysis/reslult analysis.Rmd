@@ -19,8 +19,8 @@ prdKaggle <- read.csv('C:\\Users\\Q06409\\Downloads\\Big Data\\CKME-136 Capstone
 summary(prdFull)
 summary(prdKaggle)
 
-plot(prdFull$prediction, prdKaggle$prediction)
-boxplot(prdFull$prediction, prdKaggle$prediction)
+plot(prdFull$prediction, prdKaggle$prediction, xlim= c(0, 2000), ylim = c(0, 2000), xlab = "Full set model prediction", ylab = "Kaggle model prediction")
+boxplot(prdFull$prediction, prdKaggle$prediction, names = c("Full set model prediction", "Kaggle model prediction"))
 
 t.test(prdFull$prediction, prdKaggle$prediction)
 

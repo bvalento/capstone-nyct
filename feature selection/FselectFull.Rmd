@@ -45,8 +45,16 @@ hist(trainKaggle[trainKaggle$trip_duration > 3600, ]$trip_duration, breaks=100, 
 Look at some dependencies:
 ```{r}
 summary(lm(trip_duration ~ pickup_longitude + pickup_latitude + dropoff_longitude + dropoff_latitude + 
-             as.numeric(pickup_month) + pickup_day + pickup_hour + pickup_minute + as.numeric(pickup_dow), ktrain))
+             as.numeric(pickup_month) + pickup_day + pickup_hour + pickup_minute + as.numeric(pickup_dow) + passenger_count, ktrain))
 
-summary(lm(trip_duration ~ pickup_longitude + pickup_latitude + dropoff_longitude +dropoff_latitude + pickup_month + pickup_day + pickup_hour, ktrain))
+
+#summary(lm(trip_duration ~ pickup_longitude + pickup_latitude + dropoff_longitude + dropoff_latitude + 
+#             as.numeric(pickup_month) + pickup_day + pickup_hour + pickup_minute + pickup_dow, ktrain))
+
+
+
+summary(lm(trip_duration ~ pickup_longitude + pickup_latitude + dropoff_longitude +dropoff_latitude + pickup_month + pickup_day + pickup_hour + passenger_count, ktrain))
+
+summary(lm(trip_duration ~ pickup_longitude + pickup_latitude + dropoff_longitude +dropoff_latitude + pickup_month + pickup_hour  + passenger_count, ktrain))
 
 ```
